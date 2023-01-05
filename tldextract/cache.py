@@ -27,6 +27,11 @@ _DID_LOG_UNABLE_TO_CACHE = False
 
 T = TypeVar("T")  # pylint: disable=invalid-name
 
+if sys.version_info[:2] >= (3, 9):
+    _md5 = partial(md5, usedforsecurity=False)
+else:
+    _md5 = md5
+
 
 def get_pkg_unique_identifier() -> str:
     """
@@ -44,7 +49,7 @@ def get_pkg_unique_identifier() -> str:
     tldextract_version = "tldextract-" + version
     python_env_name = os.path.basename(sys.prefix)
     # just to handle the edge case of two identically named python environments
-    python_binary_path_short_hash = hashlib.md5(sys.prefix.encode("utf-8")).hexdigest()[
+    python_binary_path_short_hash = _md5(sys.prefix.encode("utf-8")).hexdigest()[
         :6
     ]
     python_version = ".".join([str(v) for v in sys.version_info[:-1]])
@@ -237,7 +242,7 @@ def _fetch_url(session: requests.Session, url: str, timeout: Optional[int]) -> s
 
 def _make_cache_key(inputs: Union[str, Dict[str, Hashable]]) -> str:
     key = repr(inputs)
-    return md5(key.encode("utf8")).hexdigest()
+    return _md5(key.encode("utf8")).hexdigest()
 
 
 def _make_dir(filename: str) -> None:
