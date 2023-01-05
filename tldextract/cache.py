@@ -20,6 +20,7 @@ from typing import (
 
 from filelock import FileLock
 import requests
+from functools import partial
 
 LOG = logging.getLogger(__name__)
 
